@@ -19,23 +19,23 @@ Package.onUse(function (api) {
   api.use('webapp');
 
   api.use([
-    'rocketchat:oauth2-server',
+    'rocketchat:oauth2-server@2.0.0',
   ], [
     'server',
     'client',
   ]);
 
   api.use([
-    'simple:json-routes',
+    'simple:json-routes@2.1.0',
   ], [
     'server',
   ]);
 
   api.use([
-    'templating',
-    'accounts-ui',
-    'kadira:flow-router',
-    'kadira:blaze-layout',
+    'templating@1.2.15',
+    'accounts-ui@1.1.9',
+    'kadira:flow-router@2.12.1',
+    'kadira:blaze-layout@2.3.0',
     'aldeed:template-extension@4.0.0',
   ], [
     'client'

@@ -30,6 +30,7 @@ oauth2server.routes.get('/account', oauth2server.oauth.authorise(), function (re
   res.send({
     id: user._id,
     name: user.name,
+    email: user.emails[0].address,
   });
 });
 
@@ -54,4 +55,5 @@ const configClient = (client, upsert = true) => {
 export {
   clientsCollection,
   configClient,
+  oauth2server,
 };
