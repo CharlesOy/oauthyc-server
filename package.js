@@ -1,6 +1,6 @@
 Package.describe({
   name: 'charlesoy:oauthyc-server',
-  version: '0.0.1',
+  version: '1.0.0',
   summary: 'A OAuth2 server implementation Meteor package which only needs very few configuration.',
   git: 'https://github.com/CharlesOy/oauthyc-server.git',
   documentation: 'README.md'
@@ -25,7 +25,8 @@ Package.onUse(function (api) {
   ]);
 
   api.use([
-    'simple:json-routes@2.1.0',
+    'meteorhacks:picker@1.0.3',
+    'meteorhacks:aggregate@1.3.0',
   ], [
     'server',
   ]);
@@ -33,6 +34,7 @@ Package.onUse(function (api) {
   api.use([
     'templating@1.2.15',
     'accounts-ui@1.1.9',
+    'http@1.2.10',
     'kadira:flow-router@2.12.1',
     'kadira:blaze-layout@2.3.0',
     'aldeed:template-extension@4.0.0',

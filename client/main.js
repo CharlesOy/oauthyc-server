@@ -36,11 +36,16 @@ Template.authorize.onRendered(function () {
   });
 });
 
-const updateTemplate = function (newTemplate) {
+const updateTemplate = (newTemplate) => {
   newTemplate.replaces('authorize');
+};
+
+const logoutAll = () => {
+  Meteor.call('oauthyc.logoutAll');
 };
 
 export {
   clientsCollection,
   updateTemplate,
+  logoutAll,
 };

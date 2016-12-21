@@ -6,18 +6,24 @@ import winston from 'winston';
 
 import {Meteor} from 'meteor/meteor';
 import {WebApp} from 'meteor/webapp';
-import {OAuth2Server} from './common/oauth';
+import {Picker} from 'meteor/meteorhacks:picker';
+import {HTTP} from 'meteor/http';
 
+import {OAuth2Server} from './common/oauth';
 import './publications/oauthApps';
 import clientsCollection from '../imports/common';
 
 winston.level = 'info';
 
+const accessTokensCollection = new Meteor.Collection('custom_oauth_access_tokens');
+const refreshTokensCollection = new Meteor.Collection('custom_oauth_refresh_tokens');
+const authCodesCollection = new Meteor.Collection('custom_oauth_auth_codes');
+
 const oauth2server = new OAuth2Server({
-  accessTokensCollection: new Meteor.Collection('custom_oauth_access_tokens'),
-  refreshTokensCollection: new Meteor.Collection('custom_oauth_refresh_tokens'),
-  clientsCollection: clientsCollection,
-  authCodesCollection: new Meteor.Collection('custom_oauth_auth_codes'),
+  accessTokensCollection,
+  refreshTokensCollection,
+  clientsCollection,
+  authCodesCollection,
   debug: true
 });
 
@@ -34,26 +40,85 @@ oauth2server.routes.get('/account', oauth2server.oauth.authorise(), function (re
   });
 });
 
-const configClient = (client, upsert = true) => {
+function handleLogoutAllDetails(userId) {
+  // logout all OAuth Clients
+  const pipeline = [{
+    $match: {
+      userId,
+    }
+  }, {
+    $group: {
+      _id: '$clientId',
+      accessToken: {
+        $last: '$accessToken',
+      },
+    }
+  },];
+  const accessTokens = accessTokensCollection.aggregate(pipeline);
+  const results = accessTokens.map((accessToken) => {
+    const client = clientsCollection.findOne({clientId: accessToken._id});
+    accessToken.logoutUri = client === void 0 ?
+      client :
+      `${client.redirectUri.split('/').slice(0, 3).join('/')}/oauthyc/logout/${accessToken.accessToken}`;
+    return accessToken;
+  }).filter(({logoutUri}) => {
+    return logoutUri !== void 0;
+  }).map(({logoutUri}) => {
+    HTTP.call('GET', logoutUri);
+    return logoutUri;
+  });
+
+  // logout OAuth Server
+  Meteor.users.update({
+    _id: userId,
+  }, {
+    $set: {
+      'services.resume.loginTokens': [],
+    },
+  }, {
+    multi: true,
+  });
+  console.log(userId);
+
+  return results;
+}
+
+Picker.route('/oauthyc/logout_all/:token', (params, req, res) => {
+  const {userId} = accessTokensCollection.findOne({accessToken: params.token});
+  res.end(JSON.stringify(handleLogoutAllDetails(userId)));
+});
+
+const configOAuth2 = (client, upsert = true) => {
   const selector = {clientId: client.clientId};
   const count = clientsCollection.find(selector).count();
   if (count !== 0) {
     if (upsert) {
       clientsCollection.remove(selector);
-      winston.info(`${count} oauth2 client(s) removed.`);
     } else {
       throw new Error(`There is already an client which clientId is ${client.clientId}`);
     }
   }
+  client.redirectUri = client.redirectUrl;
+  delete client.redirectUrl;
   client.createdAt = new Date();
   client.active = true;
-  winston.info('Adding oauth2 client:');
+  winston.info('OAuth2 Client information:');
   winston.info(client);
   client._id = clientsCollection.insert(client);
 };
 
+Meteor.methods({
+  'oauthyc.logoutAll'(){
+    if (!Meteor.user()) {
+      return;
+    }
+    const {_id} = Meteor.user();
+    return handleLogoutAllDetails(_id);
+  }
+});
+
 export {
   clientsCollection,
-  configClient,
+  configOAuth2,
   oauth2server,
 };

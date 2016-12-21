@@ -1,14 +1,12 @@
-# OAuthyc Server (Alpha)
+# OAuthyc Server
 
 ### Description
 
-**WARNING: This package is still ongoing, there may be some bugs**.
+A OAuth2 Server implementation Meteor package with single-sign-on & single-sign-out.
 
-A OAuth2 server implementation Meteor package which only needs very few configuration.
+**Single-sign-out** is supported if all your OAuth2 Client is using [charlesoy:oauthyc-client][1].
 
-This package is mainly based on [oauth2-server][1].
-
-### Document
+### Documentation
 
 #### Installation
 
@@ -18,36 +16,47 @@ Install the package.
 $ meteor add charlesoy:oauthyc-server
 ```
 
-#### Configuration
+#### Configure OAuth2 Server
 
-##### Basic Configuration
+Configure on your oauth2 server, **note that redirectUrl path must be 'http<span></span>://.../_oauth/OAuthService'**.
 
-Configure your oauth2 client in some server file (eg. oauth.js)
+```bash
+import {configOAuth2} from 'meteor/charlesoy:oauthyc-server';
 
-```javascript
-import {configClient} from 'meteor/charlesoy:oauthyc-server';
+configOAuth2({
+  service: 'OAuth2Service',
+  clientId: 'EFyn3MxgPWJpzgrj4',
+  clientSecret: 'D4_coHrw96QJjeMVqNRYA0BzmsOVCNLM6Vp4tdjkJOU',
+  redirectUrl: 'http://localhost:3000/_oauth/OAuth2Service',
 
-configClient({
-  service: 'OAuth2Service', // OAuth2 service name
-  clientId: 'yourClientIdString', // OAuth2 client ID
-  clientSecret: 'yourClientSecretString', // OAuth2 client secret
-  redirectUri: 'http://your.client/_oauth/OAuth2Service', // redirect uri
+  // OPTIONAL
+  singleSignOut: false, // false by default.
 });
 ```
 
-That's all for the basic configuration on oauth2 server side, configuration on oauth2 client side shall be like below. 
+#### Configure OAuth2 Client
 
-```bash
-...
-  service: 'OAuth2Service',
-  clientId: 'yourClientIdString',
-  clientSecret: 'yourClientSecretString',
-  scope: [],
-  loginUrl: 'http://your.server/oauth/authorize',
-  tokenUrl: 'http://your.server/oauth/token',
-  infoUrl: 'http://your.server/account',
-...
+configure the details in some server file on your oauth2 client side(eg. accounts.js).
+
+Here is an example.
+
+```javascript
+import {configOAuthyc} from 'meteor/charlesoy:oauthyc-client';
+
+configOAuthyc({
+  clientId: 'EFyn3MxgPWJpzgrj4',
+  secret: 'D4_coHrw96QJjeMVqNRYA0BzmsOVCNLM6Vp4tdjkJOU',
+  loginUrl: 'http://localhost:3100/oauth/authorize',
+  tokenUrl: 'http://localhost:3100/oauth/token',
+  infoUrl: 'http://localhost:3100/account',
+
+  // OPTIONAL
+  loginStyle: 'redirect', // can only be 'redirect' or 'popup', by default, it's 'redirect'.
+  idProp: 'id', // by default, 'id' will be used.
+});
 ```
+
+#### Data Format
 
 The format of user information returned to client is like below.
 
@@ -59,7 +68,21 @@ The format of user information returned to client is like below.
 }
 ```
 
-##### Customize OAuth Template
+This will be configurable in the coming version.
+
+#### Logout
+
+Call logoutAll() in client code (of OAuth2 Server Application) to sign out all applications registered on OAuth2 server.
+
+```javascript
+import {logoutAll} from 'meteor/charlesoy:oauthyc-client'; 
+
+// ...
+
+logoutAll();
+```
+
+#### Customize Your Own Template
 
 The default UI is not very good looking (**just for now, and I'm still working on it**), but it's configurable by customizing your own UI template.
 
@@ -107,7 +130,7 @@ updateTemplate(Template.authenticate);
 
 Finally, customize whatever style you like in ```style.css```.
 
-### Manage from Client
+#### Manage from Client
 
 Also, the client collection is available from both client side and server side so that you can manage it yourself.
 
@@ -121,4 +144,4 @@ import {clientsCollection} from 'meteor/charlesoy:oauthyc-server';
 
 MIT
 
-[1]: https://www.npmjs.com/package/oauth2-server
+[1]: https://atmospherejs.com/charlesoy/oauthyc-client
