@@ -1,7 +1,7 @@
 Package.describe({
   name: 'charlesoy:oauthyc-server',
   version: '1.0.0',
-  summary: 'A OAuth2 server implementation Meteor package which only needs very few configuration.',
+  summary: 'An OAuth2 Server implementation with single-sign-on & single-sign-out.',
   git: 'https://github.com/CharlesOy/oauthyc-server.git',
   documentation: 'README.md'
 });
