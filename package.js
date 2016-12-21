@@ -1,7 +1,7 @@
 Package.describe({
   name: 'charlesoy:oauthyc-server',
   version: '0.0.1',
-  summary: 'A OAuth2 server implementation Meteor package which is very easy to use.',
+  summary: 'A OAuth2 server implementation Meteor package which only needs very few configuration.',
   git: 'https://github.com/CharlesOy/oauthyc-server.git',
   documentation: 'README.md'
 });
@@ -9,8 +9,9 @@ Package.describe({
 Npm.depends({
   'lodash': '4.17.2',
   'winston': '2.3.0',
-  'react': '15.4.0',
-  'react-dom': '15.4.0',
+  'oauth2-server': '2.4.1',
+  'express': '4.14.0',
+  'body-parser': '1.15.2',
 });
 
 Package.onUse(function (api) {
@@ -18,9 +19,7 @@ Package.onUse(function (api) {
   api.use('ecmascript');
   api.use('webapp');
 
-  api.use([
-    'rocketchat:oauth2-server@2.0.0',
-  ], [
+  api.use([], [
     'server',
     'client',
   ]);

@@ -6,7 +6,7 @@ import winston from 'winston';
 
 import {Meteor} from 'meteor/meteor';
 import {WebApp} from 'meteor/webapp';
-import {OAuth2Server} from 'meteor/rocketchat:oauth2-server';
+import {OAuth2Server} from './common/oauth';
 
 import './publications/oauthApps';
 import clientsCollection from '../imports/common';

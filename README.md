@@ -2,11 +2,11 @@
 
 ### Description
 
-**This package is still ongoing, there may be some bugs**.
+**WARNING: This package is still ongoing, there may be some bugs**.
 
 A OAuth2 server implementation Meteor package which only needs very few configuration.
 
-This package is mainly based on [rocketchat:oauth2-server][1].
+This package is mainly based on [oauth2-server][1].
 
 ### Document
 
@@ -49,8 +49,6 @@ That's all for the basic configuration on oauth2 server side, configuration on o
 ...
 ```
 
-##### Customize OAuth Template
-
 The format of user information returned to client is like below.
 
 ```javascript
@@ -61,15 +59,15 @@ The format of user information returned to client is like below.
 }
 ```
 
-The default UI is not very good looking (**just for now, and I'm still working on it**), but it's configurable by customizing oauth template.
+##### Customize OAuth Template
+
+The default UI is not very good looking (**just for now, and I'm still working on it**), but it's configurable by customizing your own UI template.
 
 ```bash
-...
 -oauth
  |-main.html
  |-main.js
  |-style.css
-...
 ```
 
 The ```main.html``` file should contain the fundemental fields.
@@ -107,14 +105,20 @@ import './style.css';
 updateTemplate(Template.authenticate);
 ```
 
-Finally, customize the style in ```style.css```.
+Finally, customize whatever style you like in ```style.css```.
 
 ### Manage from Client
 
-TBD
+Also, the client collection is available from both client side and server side so that you can manage it yourself.
+
+```javascript
+import {clientsCollection} from 'meteor/charlesoy:oauthyc-server';
+
+// do whatever you like with clientsCollection
+```
 
 ### Licence
 
 MIT
 
-[1]: https://atmospherejs.com/rocketchat/oauth2-server
+[1]: https://www.npmjs.com/package/oauth2-server
