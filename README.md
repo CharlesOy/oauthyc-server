@@ -75,7 +75,7 @@ This will be configurable in the coming version.
 Call logoutAll() in client code (of OAuth2 Server Application) to sign out all applications registered on OAuth2 server.
 
 ```javascript
-import {logoutAll} from 'meteor/charlesoy:oauthyc-client'; 
+import {logoutAll} from 'meteor/charlesoy:oauthyc-server'; 
 
 // ...
 
