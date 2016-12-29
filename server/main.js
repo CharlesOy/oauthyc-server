@@ -10,8 +10,9 @@ import {Picker} from 'meteor/meteorhacks:picker';
 import {HTTP} from 'meteor/http';
 
 import {OAuth2Server} from './common/oauth';
-import './publications/oauthApps';
 import clientsCollection from '../imports/common';
+import './publications/oauthApps';
+import './publications/users';
 
 winston.level = 'info';
 
@@ -35,12 +36,24 @@ oauth2server.routes.get('/account', oauth2server.oauth.authorise(), function (re
   const user = Meteor.users.findOne(req.user.id);
   res.send({
     id: user._id,
-    name: user.name,
-    email: user.emails[0].address,
+    name: user.username,
+    email: user.username,
+    // email: user.emails ? user.emails[0].address : '',
   });
 });
 
 function handleLogoutAllDetails(userId) {
+  // logout OAuth2 Server
+  Meteor.users.update({
+    _id: userId,
+  }, {
+    $set: {
+      'services.resume.loginTokens': [],
+    },
+  }, {
+    multi: true,
+  });
+
   // logout all OAuth Clients
   const pipeline = [{
     $match: {
@@ -67,18 +80,6 @@ function handleLogoutAllDetails(userId) {
     HTTP.call('GET', logoutUri);
     return logoutUri;
   });
-
-  // logout OAuth Server
-  Meteor.users.update({
-    _id: userId,
-  }, {
-    $set: {
-      'services.resume.loginTokens': [],
-    },
-  }, {
-    multi: true,
-  });
-  console.log(userId);
 
   return results;
 }

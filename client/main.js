@@ -13,6 +13,7 @@ import './routes';
 // to auto accept
 Template.authorize.onCreated(function () {
   this.subscribe('oauthApps');
+  this.subscribe('userData');
 });
 
 // Get the login token to pass to oauth
@@ -26,12 +27,19 @@ Template.authorize.helpers({
 // Auto click the submit/accept button if user already
 // accepted this client
 Template.authorize.onRendered(function () {
-  const data = this.data;
+  // const data = this.data;
   this.autorun(function (c) {
     const user = Meteor.user();
-    if (user && user.oauth && user.oauth.athorizedClients && user.oauth.athorizedClients.indexOf(data.client_id()) > -1) {
+    if (!user || !user.oauth) {
+      return;
+    }
+    // if (user && user.oauth && user.oauth.authorizedClients && user.oauth.authorizedClients.indexOf(data.client_id()) > -1) {
+    //   c.stop();
+    //   $('button[type=submit]').click();
+    // }
+    if (user) {
       c.stop();
-      $('button').click();
+      $('button[type=submit]').click();
     }
   });
 });
